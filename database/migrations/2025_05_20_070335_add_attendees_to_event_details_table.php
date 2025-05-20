@@ -9,18 +9,21 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
-{
-    Schema::table('event_details', function (Blueprint $table) {
-        $table->json('attendees')->nullable();
-    });
-}
+    public function up(): void
+    {
+        Schema::table('event_details', function (Blueprint $table) {
+            // If the column already exists and is not integer, you may need to cast it manually
+            $table->integer('attendees')->nullable()->change();
+        });
+    }
 
-public function down()
-{
-    Schema::table('event_details', function (Blueprint $table) {
-        $table->dropColumn('attendees');
-    });
-}
-
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('event_details', function (Blueprint $table) {
+            $table->json('attendees')->nullable()->change();
+        });
+    }
 };
