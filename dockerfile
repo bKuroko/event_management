@@ -36,7 +36,7 @@ RUN chown -R www-data:www-data /var/www/html \
 RUN composer install --no-dev --optimize-autoloader
 
 # Install Node.js dependencies and build assets for Vite
-RUN npm install && npm run build
+RUN npm install && npm run build && npm run dev
 
 # Prepare Laravel
 RUN cp .env.example .env \
