@@ -8,9 +8,10 @@ RUN apt-get update && apt-get install -y \
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
 
-# Set Laravel public directory as Apache document root
+# Set document root to /public
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 
+# Apply the new document root
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
     /etc/apache2/sites-available/000-default.conf \
     && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' \
@@ -33,13 +34,11 @@ RUN chown -R www-data:www-data /var/www/html \
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Set up environment file and application key
+# Prepare Laravel
 RUN cp .env.example .env \
     && php artisan key:generate \
     && php artisan config:cache
 
-# Expose port 80
 EXPOSE 80
 
-# Start Apache in the foreground
 CMD ["apache2-foreground"]
