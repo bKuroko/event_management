@@ -1,8 +1,9 @@
 FROM php:8.2-apache
 
-# Install system dependencies including PostgreSQL support
+# Install system dependencies including PostgreSQL support, nodejs and npm
 RUN apt-get update && apt-get install -y \
     zip unzip curl libzip-dev libonig-dev libpq-dev \
+    nodejs npm \
     && docker-php-ext-install pdo pdo_mysql pdo_pgsql zip
 
 # Enable Apache mod_rewrite
@@ -34,6 +35,9 @@ RUN chown -R www-data:www-data /var/www/html \
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
+# Install Node.js dependencies and build assets for Vite
+RUN npm install && npm run build
+
 # Prepare Laravel
 RUN cp .env.example .env \
     && php artisan key:generate \
@@ -41,5 +45,5 @@ RUN cp .env.example .env \
 
 EXPOSE 80
 
-# Run migrations and seed DB before starting Apache
+# Run migrations, seed DB, then start Apache
 CMD php artisan migrate --force && php artisan db:seed --force && apache2-foreground
