@@ -1,6 +1,6 @@
 FROM php:8.2-apache
 
-# Install system dependencies including libpq-dev for PostgreSQL
+# Install system dependencies including PostgreSQL support
 RUN apt-get update && apt-get install -y \
     zip unzip curl libzip-dev libonig-dev libpq-dev \
     && docker-php-ext-install pdo pdo_mysql pdo_pgsql zip
@@ -41,4 +41,5 @@ RUN cp .env.example .env \
 
 EXPOSE 80
 
-CMD ["apache2-foreground"]
+# Run migrations and seed DB before starting Apache
+CMD php artisan migrate --force && php artisan db:seed --force && apache2-foreground
